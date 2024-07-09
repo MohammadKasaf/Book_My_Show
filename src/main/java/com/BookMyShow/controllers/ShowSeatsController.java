@@ -1,0 +1,9 @@
+package com.BookMyShow.controllers;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("showSeats")
+public class showSeatsController {
+}
