@@ -1,9 +1,9 @@
 package com.BookMyShow.services;
 
-import com.BookMyShow.dto.movieDTO;
+import com.BookMyShow.dto.MovieDTO;
 import com.BookMyShow.models.Movie;
 import com.BookMyShow.repositories.MovieRepository;
-import com.BookMyShow.requests.updateMovieRequest;
+import com.BookMyShow.requests.UpdateMovieRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class movieService {
+public class MovieService {
 
     @Autowired
    private MovieRepository movieRepository;
 
     //add movie
-    public String addMovie(movieDTO movieDTO){
+    public String addMovie(MovieDTO movieDTO){
 
         Movie movie=new Movie();
         movie.setMovieName(movieDTO.getMovieName());
@@ -31,7 +31,7 @@ public class movieService {
     }
 
          //update existing movie
-         public String updateMovie(updateMovieRequest updateMovieRequest){
+         public String updateMovie(UpdateMovieRequest updateMovieRequest){
 
             Movie movie=movieRepository.findMovieByMovieName(updateMovieRequest.getMovieName());
             movie.setRating(updateMovieRequest.getNewRating());
@@ -42,9 +42,9 @@ public class movieService {
          }
 
          //find movie
-         public Optional<Movie> findMovie(movieDTO movieDTO){
+         public Optional<Movie> findMovieById(Integer movieId){
 
-            Optional<Movie> movie=movieRepository.findById(movieDTO.getMovieId());
+            Optional<Movie> movie=movieRepository.findById(movieId);
             return movie;
          }
 
@@ -55,12 +55,16 @@ public class movieService {
          }
 
          //delete movie
-       public String deleteMovie(movieDTO movieDTO){
+       public String deleteMovieById(Integer movieId){
 
-        movieRepository.deleteById(movieDTO.getMovieId());
-        return "Movie deleted successfully with movieId"+movieDTO.getMovieId();
+        movieRepository.deleteById(movieId);
+        return "Movie deleted successfully with movieId"+movieId;
     }
 
-    // i want to create a method when i put movie name they return all the theater name where this movie is playing
+    // method when i put movie name they return all the theater name where this movie is playing
+    public List<String> findTheaterNameByMovieName(String movieName) {
 
+        return movieRepository.findTheaterNamesByMovieName(movieName);
+
+    }
 }

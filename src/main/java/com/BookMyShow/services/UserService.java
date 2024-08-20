@@ -1,6 +1,6 @@
 package com.BookMyShow.services;
 
-import com.BookMyShow.dto.userDTO;
+import com.BookMyShow.dto.UserDTO;
 import com.BookMyShow.models.User;
 import com.BookMyShow.repositories.UserRepository;
 import com.BookMyShow.requests.AddUserRequest;
@@ -9,8 +9,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class userService {
+public class UserService {
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -37,7 +39,7 @@ public class userService {
         return "User added successfully with user id "+user.getUserId();
     }
 
-    public String deleteUserByNameAndId(userDTO userDTO){
+    public String deleteUserByNameAndId(UserDTO userDTO){
 
         User user=userRepository.findById(userDTO.getId()).get();
         if(user.getName()==userDTO.getName()){
@@ -54,6 +56,11 @@ public class userService {
         }
 
         return "User not found";
+    }
+
+    public List<User> getAllUsers(){
+
+        return userRepository.findAll();
     }
 
 }

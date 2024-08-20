@@ -1,12 +1,13 @@
 package com.BookMyShow.services;
 
 import com.BookMyShow.enums.SeatType;
+import com.BookMyShow.models.Movie;
 import com.BookMyShow.models.Theater;
 import com.BookMyShow.models.TheaterSeat;
 import com.BookMyShow.repositories.TheaterRepository;
 import com.BookMyShow.repositories.TheaterSeatRepository;
 import com.BookMyShow.requests.AddTheaterSeatRequest;
-import com.BookMyShow.requests.addTheaterRequest;
+import com.BookMyShow.requests.AddTheaterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,17 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class theaterService {
+public class TheaterService {
 
     @Autowired
     private TheaterRepository theaterRepository;
     @Autowired
     private TheaterSeatRepository theaterSeatRepository;
 
-    public String addTheater(addTheaterRequest addTheaterRequest) {
+    public String addTheater(AddTheaterRequest addTheaterRequest) {
 
         Theater theater = new Theater();
-        theater.setName(addTheaterRequest.getName());
+        theater.setTheaterName(addTheaterRequest.getName());
         theater.setAddress(addTheaterRequest.getAddress());
         theater.setNumberOfScreens(addTheaterRequest.getNumberOfScreens());
         theaterRepository.save(theater);
@@ -116,4 +117,17 @@ public class theaterService {
         return "Theater seats added successfully";
 
     }
+
+        // method when i put theater name then return all movies name which are playing in that theater
+        public List<String> getAllMoviesInTheater(String theaterName){
+
+            Theater theater=theaterRepository.findByTheaterName(theaterName);
+            List<String> movies=new ArrayList<>();
+            for(Movie movie:theater.getMovies()){
+
+                movies.add(movie.getMovieName());
+            }
+
+            return movies;
+        }
 }

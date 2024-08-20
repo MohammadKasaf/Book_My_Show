@@ -6,13 +6,15 @@ import com.BookMyShow.repositories.*;
 import com.BookMyShow.requests.BookTicketRequest;
 import com.BookMyShow.requests.TicketResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 
 @Service
-public class ticketService {
+public class TicketService {
 
     @Autowired
     private ShowSeatsRepository showSeatsRepository;
@@ -29,9 +31,14 @@ public class ticketService {
     @Autowired
     private TheaterRepository theaterRepository;
 
+    @Autowired
+    JavaMailSender javaMailSender;
+
 
     public String bookTicket(@RequestBody BookTicketRequest ticketRequest){
 
+        //for sending email for confirmation ticket details
+        SimpleMailMessage message=new SimpleMailMessage();
 
         //1.find the show entity
         Show show=showRepository.findById(ticketRequest.getShowId()).orElse(null);
@@ -64,9 +71,17 @@ public class ticketService {
         Ticket ticket=Ticket.builder().totalAmount(totalAmount)
                 .showDate(show.getShowDate()).showTime(show.getShowTime())
                 .user(user).show(show).movieName(show.getMovie().getMovieName())
-                .theaterName(show.getTheater().getName()).bookedSeats(ticketRequest.getRequestedSeats().toString())
+                .theaterName(show.getTheater().getTheaterName()).bookedSeats(ticketRequest.getRequestedSeats().toString())
                 .build();
 
+         //for email
+         message.setSubject("Ticket Details");
+         message.setText("Your ticket details are : "+ticket.toString());
+         message.setTo(user.getEmailId());
+         message.setFrom("springboot471@gmail.com");
+         javaMailSender.send(message);
+
+         //5. save the ticket and update the show seat list
          ticket=ticketRepository.save(ticket);
          showSeatsRepository.saveAll(show.getShowSeatList());
 
@@ -119,13 +134,13 @@ public class ticketService {
 
 
     //find one day revenue of theater
-    public String oneDayRevenueOfTheater(Integer theaterId, LocalDate date){
+    public String oneDayRevenueOfTheater(String theaterName, LocalDate date){
 
         int totalRevenue=0;
-        Theater theater = theaterRepository.findById(theaterId).orElse(null); // Use of orElse to handle Optional
+        Theater theater = theaterRepository.findByTheaterName(theaterName); // Use of orElse to handle Optional
 
         if (theater == null) {
-            return "Theater with ID " + theaterId + " not found.";
+            return "Theater with Name " + theaterName + " not found.";
         }
 
         for(Show show:theater.getShowList()){
@@ -140,17 +155,17 @@ public class ticketService {
         }
       }
 
-        return "Total revenue of theater "+theater.getName()+" on "+date+" is "+totalRevenue;
+        return "Total revenue of theater "+theater.getTheaterName()+" on "+date+" is "+totalRevenue;
     }
 
     //lifeTime revenue of theater
-    public String lifeTimeRevenueOfTheater(Integer theaterId){
+    public String lifeTimeRevenueOfTheater(String theaterName){
 
         int totalRevenue=0;
-        Theater theater = theaterRepository.findById(theaterId).orElse(null); // Use of orElse to handle Optional
+        Theater theater = theaterRepository.findByTheaterName(theaterName);
 
         if (theater == null) {
-            return "Theater with ID " + theaterId + " not found.";
+            return "Theater with I name " + theaterName + " not found.";
         }
         for(Show show:theater.getShowList()){
 
@@ -161,6 +176,6 @@ public class ticketService {
             }
         }
 
-        return "Total revenue of theater "+theater.getName()+" is "+totalRevenue;
+        return "Total revenue of theater "+theater.getTheaterName()+" is "+totalRevenue;
     }
 }

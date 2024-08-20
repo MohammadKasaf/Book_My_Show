@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class userDTO {
+public class UserDTO {
 
     private int id;
     private String name;
-    private String email;
     // we dont include password field here bcz password is sensititve data
 }

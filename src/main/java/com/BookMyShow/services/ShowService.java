@@ -6,6 +6,7 @@ import com.BookMyShow.models.Theater;
 import com.BookMyShow.models.TheaterSeat;
 import com.BookMyShow.repositories.ShowRepository;
 import com.BookMyShow.repositories.ShowSeatsRepository;
+import com.BookMyShow.repositories.TicketRepository;
 import com.BookMyShow.requests.AddShowRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,16 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class showService {
+public class ShowService {
 
     @Autowired
     private ShowRepository showRepository;
 
-    @Autowired
-    private Theater theater;
+
+    private Theater theater=new Theater();
 
     @Autowired
     private ShowSeatsRepository showSeatsRepository;
+
+    @Autowired
+    private TicketRepository ticketRepository;
 
     public String addShow(AddShowRequest showRequest){
 
@@ -55,5 +59,20 @@ public class showService {
 
         return "Show added successfully with showId"+save.getShowId();
 
+    }
+
+    //delete show
+    public String deleteShow(int showId){
+
+        Show show=showRepository.findById(showId).orElse(null);
+
+        if(show!=null){
+            showRepository.deleteById(showId);
+            ticketRepository.deleteByShow(showId);
+            return "Show deleted successfully";
+        }
+        else{
+            return "Show not found";
+        }
     }
 }

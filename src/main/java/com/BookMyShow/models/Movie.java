@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-
 
 @Entity
 @Table(name = "movies")
@@ -31,7 +31,14 @@ public class Movie {
 
     private Double rating;
 
-    @OneToMany(mappedBy = "Movie",cascade = CascadeType.ALL)
-    private List<Show> showList;
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Show> showList = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "movie_theater",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "theater_id")
+    )
+    private List<Theater> theaterList = new ArrayList<>();
 }

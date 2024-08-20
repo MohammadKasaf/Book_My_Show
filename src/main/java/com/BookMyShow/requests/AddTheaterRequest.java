@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class addTheaterRequest {
+public class AddTheaterRequest {
 
     private int numberOfScreens;
     private String name;

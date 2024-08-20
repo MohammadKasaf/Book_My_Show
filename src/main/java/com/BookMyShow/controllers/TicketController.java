@@ -1,9 +1,8 @@
 package com.BookMyShow.controllers;
 
-import com.BookMyShow.models.Ticket;
 import com.BookMyShow.requests.BookTicketRequest;
 import com.BookMyShow.requests.TicketResponse;
-import com.BookMyShow.services.ticketService;
+import com.BookMyShow.services.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +12,10 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("ticket")
-public class ticketController {
+public class TicketController {
 
     @Autowired
-    private ticketService ticketService;
+    private TicketService ticketService;
 
     @PostMapping("/bookTicket")
     public ResponseEntity<?> bookTicket(@RequestBody BookTicketRequest  bookTicketRequest) {
@@ -59,10 +58,10 @@ public class ticketController {
     }
 
     @GetMapping("/oneDayRevenueOfTheater")
-    public ResponseEntity<?> oneDayRevenueOfTheater(@RequestParam("theaterId")Integer theaterId, @RequestParam("date")LocalDate date){
+    public ResponseEntity<?> oneDayRevenueOfTheater(@RequestParam("theaterName")String theaterName, @RequestParam("date")LocalDate date){
 
         try{
-            String revenue=ticketService.oneDayRevenueOfTheater(theaterId,date);
+            String revenue=ticketService.oneDayRevenueOfTheater(theaterName,date);
             return new ResponseEntity<>(revenue, HttpStatus.FOUND);
         }
         catch(Exception e){
@@ -71,10 +70,10 @@ public class ticketController {
     }
 
     @GetMapping("/lifeTimeRevenueOfTheater")
-    public ResponseEntity<?> lifeTimeRevenueOfTheater(@RequestParam("theaterId")Integer theaterId){
+    public ResponseEntity<?> lifeTimeRevenueOfTheater(@RequestParam("theaterName")String theaterName){
 
         try{
-            String revenue=ticketService.lifeTimeRevenueOfTheater(theaterId);
+            String revenue=ticketService.lifeTimeRevenueOfTheater(theaterName);
             return new ResponseEntity<>(revenue, HttpStatus.FOUND);
         }
         catch(Exception e){
