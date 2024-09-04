@@ -1,17 +1,24 @@
 package com.BookMyShow.services;
 
-import com.BookMyShow.enums.SeatType;
+import com.BookMyShow.enums.*;
 import com.BookMyShow.models.*;
 import com.BookMyShow.repositories.*;
-import com.BookMyShow.requests.BookTicketRequest;
-import com.BookMyShow.requests.TicketResponse;
+import com.BookMyShow.requests.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 public class TicketService {
@@ -54,6 +61,9 @@ public class TicketService {
              String seatNumber=showSeat.getSeatNumber();
              if(ticketRequest.getRequestedSeats().contains(seatNumber)){
 
+                 if(showSeat.getIsBooked()==Boolean.TRUE){
+                     return "Seat already booked";
+                 }
                  showSeat.setIsBooked(Boolean.TRUE);
 
                  if(showSeat.getSeatType().equals(SeatType.CLASSIC)){
@@ -125,11 +135,25 @@ public class TicketService {
 
         if(seatUpdated){
             ticketRepository.delete(ticket);
+            sendCancellationEmail(ticket);
             return "Ticket with id : "+ticketId+" cancelled successfully";
         }
 
          return "Ticket with id : "+ticketId+" not found or" +
                  " you are not allowed to cancel this ticket";
+    }
+
+    private void sendCancellationEmail(Ticket ticket) {
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setTo(ticket.getUser().getEmailId());
+        simpleMailMessage.setFrom("kaashifchishti611@gmail.com");
+        simpleMailMessage.setSubject("Ticket Cancellation Notification");
+        simpleMailMessage.setText("Dear " + ticket.getUser().getUsername() + ",\n\n"
+                + "Your ticket with ID " + ticket.getTicketId() + " has been successfully cancelled.\n\n"
+                + "Thank you for using BookMyShow.\n\n"
+                + "Best Regards,\n"
+                + "BookMyShow Team");
+        javaMailSender.send(simpleMailMessage);
     }
 
 

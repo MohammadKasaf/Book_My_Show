@@ -2,10 +2,9 @@ package com.BookMyShow.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
+import com.BookMyShow.models.Show;
 
 @Entity
 @Data

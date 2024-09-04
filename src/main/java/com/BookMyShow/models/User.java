@@ -1,6 +1,8 @@
 package com.BookMyShow.models;
 
+import com.BookMyShow.models.Ticket;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -17,12 +19,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
-    private String name;
-
+    @Column(name = "username", nullable = false, unique = true)
+    @NotBlank(message = "username is mandatory")
+    private String username;
+    private String password;
+    private String role;
     private Integer age;
-
     private String emailId;
-
     private String mobileNumber;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
