@@ -10,7 +10,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 public class BookMyShowApplication {
 	public static void main(String[] args) {
+
 		SpringApplication.run(BookMyShowApplication.class, args);
 	}
+
 }
 

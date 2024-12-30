@@ -1,4 +1,4 @@
-package com.BookMyShow.requests;
+package com.BookMyShow.requestDto;
 
 import com.BookMyShow.enums.Language;
 import lombok.AllArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 @Builder
 public class UpdateMovieRequest {
 
+    private Long movieId;
     private String movieName;
     private Language newlanguage;
     private Double newRating;

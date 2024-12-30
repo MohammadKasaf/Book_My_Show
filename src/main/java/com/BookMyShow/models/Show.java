@@ -1,5 +1,6 @@
 package com.BookMyShow.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,16 +19,13 @@ public class Show {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer showId;
+    private Long showId;
 
     private LocalDate showDate;
-
     private LocalTime showTime;
 
-
-
     @ManyToOne
-    @JoinColumn(name = "movie_id")
+    @JoinColumn(name = "movie_id",nullable = false)
     private Movie movie;
 
     @OneToMany(mappedBy = "show", cascade = CascadeType.ALL)
@@ -35,7 +33,7 @@ public class Show {
 
 
     @ManyToOne
-    @JoinColumn(name = "theater_id")
+    @JoinColumn(name = "theater_id",nullable = false)
     private Theater theater;
 
     @OneToMany(mappedBy = "show",cascade = CascadeType.ALL)

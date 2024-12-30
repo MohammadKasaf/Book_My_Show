@@ -17,10 +17,9 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId;
+    private Long userId;
 
-    @Column(name = "username", nullable = false, unique = true)
-    @NotBlank(message = "username is mandatory")
+    @Column(name = "username", nullable = false)
     private String username;
     private String password;
     private String role;

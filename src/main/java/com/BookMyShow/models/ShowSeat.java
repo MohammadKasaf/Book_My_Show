@@ -14,14 +14,14 @@ public class ShowSeat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer showSeatId;
+    private Long showSeatId;
     private String seatNumber;
     @Enumerated(value = EnumType.STRING)
     private SeatType seatType;
     private Boolean isBooked;
     private Boolean isFoodAttached;
 
-    @JoinColumn
     @ManyToOne
+    @JoinColumn(name = "show_id")
     private Show show;
 }

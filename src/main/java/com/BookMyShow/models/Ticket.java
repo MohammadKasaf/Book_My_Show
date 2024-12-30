@@ -15,8 +15,8 @@ import com.BookMyShow.models.Show;
 public class Ticket {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String ticketId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long ticketId;
     private String bookedSeats;
     private LocalDate showDate;
     private LocalTime showTime;
@@ -25,11 +25,11 @@ public class Ticket {
     private Integer totalAmount;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "show_id")
+    @JoinColumn(name = "show_id",nullable = false)
     private Show show;
 
 }

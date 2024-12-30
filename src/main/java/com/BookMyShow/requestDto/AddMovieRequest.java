@@ -1,4 +1,4 @@
-package com.BookMyShow.dto;
+package com.BookMyShow.requestDto;
 
 import com.BookMyShow.enums.Language;
 import lombok.AllArgsConstructor;
@@ -12,9 +12,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
-public class MovieDTO {
+public class AddMovieRequest {
 
-    private int movieId;
     private String movieName;
     private Language language;
     private Double rating;

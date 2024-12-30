@@ -14,7 +14,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Component
 @Builder
-public class TicketResponse {
+public class GetTicketResponse {
 
     private String movieName;
     private LocalTime showTime;

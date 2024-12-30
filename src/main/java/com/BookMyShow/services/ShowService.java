@@ -1,13 +1,9 @@
 package com.BookMyShow.services;
 
-import com.BookMyShow.models.Show;
-import com.BookMyShow.models.ShowSeat;
-import com.BookMyShow.models.Theater;
-import com.BookMyShow.models.TheaterSeat;
-import com.BookMyShow.repositories.ShowRepository;
-import com.BookMyShow.repositories.ShowSeatsRepository;
-import com.BookMyShow.repositories.TicketRepository;
-import com.BookMyShow.requests.AddShowRequest;
+import com.BookMyShow.models.*;
+import com.BookMyShow.repositories.*;
+import com.BookMyShow.requestDto.AddShowRequest;
+import com.BookMyShow.responseDto.GetShowResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +16,8 @@ public class ShowService {
     @Autowired
     private ShowRepository showRepository;
 
-
-    private Theater theater=new Theater();
+    @Autowired
+    private TheaterRepository theaterRepository;
 
     @Autowired
     private ShowSeatsRepository showSeatsRepository;
@@ -29,50 +25,87 @@ public class ShowService {
     @Autowired
     private TicketRepository ticketRepository;
 
-    public String addShow(AddShowRequest showRequest){
+    @Autowired
+    private MovieRepository movieRepository;
 
-        Show show= Show.builder().showDate(showRequest.getShowDate())
-                .showTime(showRequest.getShowTime()).build();
+    public String addShow(AddShowRequest showRequest) {
 
-        Show save=showRepository.save(show);
-
-        //associate the corresponding show seats along with it
-        List<TheaterSeat> theaterSeatList=theater.getTheaterSeatList();
-        List<ShowSeat> showSeatList=new ArrayList<>();
-
-        for(TheaterSeat theaterSeat:theaterSeatList){
-
-            ShowSeat showSeat=ShowSeat.builder().seatNumber(theaterSeat.getSeatNumber())
-                          .isBooked(Boolean.FALSE).seatType(theaterSeat.getSeatType())
-                          .show(save).isFoodAttached(Boolean.FALSE).build();
-
-                     showSeatList.add(showSeat);
+        Theater theater = theaterRepository.findById(showRequest.getTheaterId())
+                .orElseThrow(() -> new RuntimeException("Theater with ID " + showRequest.getTheaterId() + " not found"));
 
 
+        Movie movie = movieRepository.findById(showRequest.getMovieId())
+                .orElseThrow(()->new RuntimeException("movie not found with this id: " + showRequest.getMovieId()));
 
+        // 2. Create and save the Show
+        Show show = Show.builder()
+                .showDate(showRequest.getShowDate())
+                .showTime(showRequest.getShowTime())
+                .movie(movie)
+                .theater(theater)
+                .build();
+
+        Show savedShow = showRepository.save(show);
+
+        // 3. Associate the corresponding show seats with the show
+        List<TheaterSeat> theaterSeatList = theater.getTheaterSeatList();
+        List<ShowSeat> showSeatList = new ArrayList<>();
+
+        for (TheaterSeat theaterSeat : theaterSeatList) {
+            ShowSeat showSeat = ShowSeat.builder()
+                    .seatNumber(theaterSeat.getSeatNumber())
+                    .isBooked(Boolean.FALSE)
+                    .seatType(theaterSeat.getSeatType())
+                    .show(savedShow)
+                    .isFoodAttached(Boolean.FALSE)
+                    .build();
+
+            showSeatList.add(showSeat);
         }
 
-        //setting the bidirectional mapping
-        show.setShowSeatList(showSeatList);
-
+        // 4. Set the bidirectional mapping and save the show seats
+        savedShow.setShowSeatList(showSeatList);
         showSeatsRepository.saveAll(showSeatList);
 
-        return "Show added successfully with showId"+save.getShowId();
-
+        return "Show added successfully with showId " + savedShow.getShowId();
     }
 
-    //delete show
-    public String deleteShow(int showId){
+    // Delete show
+    public String deleteShow(Long showId) {
 
-        Show show=showRepository.findById(showId).orElse(null);
+        Show show=showRepository.findById(showId)
+                .orElseThrow(()->new RuntimeException("show is not found with this id: " + showId));
 
-        if(show!=null){
-            showRepository.deleteById(showId);
-            ticketRepository.deleteByShow(showId);
-            return "Show deleted successfully";
-        }
-        else{
-            return "Show not found";
-        }
+        showRepository.delete(show);
+        return "show successfully deleted";
     }
+
+    public List<GetShowResponse> getAllShowsByTheaterId(Long theaterId) {
+
+
+            List<Show> shows = showRepository.findAll();
+            List<GetShowResponse> showRequests = new ArrayList<>();
+
+            for (Show show : shows) {
+
+                if(show.getTheater().getTheaterId()==theaterId) {
+
+                    String movieName = show.getMovie() != null ? show.getMovie().getMovieName() : "Movie not assigned";
+                    String theaterName = show.getTheater() != null ? show.getTheater().getTheaterName() : null;
+
+                    GetShowResponse showResponse = new GetShowResponse();
+                    showResponse.setShowDate(show.getShowDate());
+                    showResponse.setShowTime(show.getShowTime());
+                    showResponse.setMovieName(movieName);
+                    showResponse.setTheaterName(theaterName);
+
+                    showRequests.add(showResponse);
+
+                }
+            }
+            return showRequests;
+    }
+
+
+
 }

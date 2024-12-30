@@ -1,4 +1,4 @@
-package com.BookMyShow.requests;
+package com.BookMyShow.requestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,11 +17,9 @@ import java.util.List;
 @Builder
 public class BookTicketRequest {
 
-    private int userId;
+    private Long userId;
     private String movieName;
     private String theaterName;
-    private LocalTime  showTime;
-    private LocalDate showDate;
-    private int showId;
+    private Long showId;
     private List<String> requestedSeats;
 }

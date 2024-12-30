@@ -17,7 +17,7 @@ public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer movieId;
+    private Long movieId;
 
     @Column(unique = true)
     private String movieName;
@@ -31,7 +31,7 @@ public class Movie {
 
     private Double rating;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private List<Show> showList = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)

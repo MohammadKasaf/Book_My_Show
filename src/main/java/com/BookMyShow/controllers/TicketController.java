@@ -1,7 +1,7 @@
 package com.BookMyShow.controllers;
 
-import com.BookMyShow.requests.BookTicketRequest;
-import com.BookMyShow.requests.TicketResponse;
+import com.BookMyShow.requestDto.BookTicketRequest;
+import com.BookMyShow.responseDto.GetTicketResponse;
 import com.BookMyShow.services.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,6 @@ public class TicketController {
 
     @PostMapping("/bookTicket")
     public ResponseEntity<?> bookTicket(@RequestBody BookTicketRequest  bookTicketRequest) {
-        // Book the ticket
          try{
 
              String ticket=ticketService.bookTicket(bookTicketRequest);
@@ -32,10 +31,10 @@ public class TicketController {
     }
 
     @GetMapping("/generateTicket")
-    public ResponseEntity<?> generateTicket(@RequestParam("tickedId")String ticketId) {
-        // Generate the ticket
+    public ResponseEntity<?> generateTicket(@RequestParam("tickedId")Long ticketId){
+
         try{
-            TicketResponse ticketResponse=ticketService.generateTicket(ticketId);
+            GetTicketResponse ticketResponse=ticketService.generateTicket(ticketId);
             return new ResponseEntity<>(ticketResponse, HttpStatus.OK);
         }
         catch(Exception e){
@@ -45,7 +44,7 @@ public class TicketController {
 
 
     @DeleteMapping("/cancelTicket")
-    public ResponseEntity<?> cancelTicket(@RequestParam("ticketId")String ticketId){
+    public ResponseEntity<?> cancelTicket(@RequestParam("ticketId")Long ticketId){
 
         try{
             String response=ticketService.cancelTicket(ticketId);
@@ -57,27 +56,5 @@ public class TicketController {
         }
     }
 
-    @GetMapping("/oneDayRevenueOfTheater")
-    public ResponseEntity<?> oneDayRevenueOfTheater(@RequestParam("theaterName")String theaterName, @RequestParam("date")LocalDate date){
 
-        try{
-            String revenue=ticketService.oneDayRevenueOfTheater(theaterName,date);
-            return new ResponseEntity<>(revenue, HttpStatus.FOUND);
-        }
-        catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping("/lifeTimeRevenueOfTheater")
-    public ResponseEntity<?> lifeTimeRevenueOfTheater(@RequestParam("theaterName")String theaterName){
-
-        try{
-            String revenue=ticketService.lifeTimeRevenueOfTheater(theaterName);
-            return new ResponseEntity<>(revenue, HttpStatus.FOUND);
-        }
-        catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
 }

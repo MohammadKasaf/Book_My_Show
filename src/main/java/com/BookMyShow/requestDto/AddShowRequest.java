@@ -1,4 +1,4 @@
-package com.BookMyShow.requests;
+package com.BookMyShow.requestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +19,6 @@ public class AddShowRequest {
 
     LocalDate showDate;
     LocalTime showTime;
-    private String movieName;
-    private Integer theaterId;
+    private Long movieId;
+    private Long theaterId;
 }

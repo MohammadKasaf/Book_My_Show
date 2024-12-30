@@ -1,4 +1,4 @@
-package com.BookMyShow.requests;
+package com.BookMyShow.requestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Builder
 public class AddTheaterSeatRequest {
 
-    private int theaterId;
+    private Long theaterId;
     private int numberOfClassicSeats;
     private int numberOfPremiumSeats;
 }

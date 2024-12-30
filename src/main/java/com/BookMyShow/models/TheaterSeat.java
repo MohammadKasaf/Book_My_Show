@@ -16,16 +16,13 @@ public class TheaterSeat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+    private Long theaterSeatId;
     private String seatNumber;
-
     @Enumerated(value = EnumType.STRING)
     private SeatType seatType;
 
-
     @ManyToOne
-    @JoinColumn(name = "theater_id")
+    @JoinColumn(name = "theater_id",nullable = false)
     private Theater theater;
 
 }

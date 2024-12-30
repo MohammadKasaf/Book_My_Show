@@ -1,9 +1,7 @@
-package com.BookMyShow.requests;
+package com.BookMyShow.requestDto;
 
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +16,6 @@ import org.springframework.stereotype.Component;
 public class AddUserRequest {
 
 
-    @Column(name = "name", nullable = false, unique = true)
-    @NotBlank(message = "Name is mandatory")
     private String userName;
     private String role;
     private String password;

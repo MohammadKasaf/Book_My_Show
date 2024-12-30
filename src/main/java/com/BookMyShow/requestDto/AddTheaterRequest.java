@@ -1,4 +1,4 @@
-package com.BookMyShow.requests;
+package com.BookMyShow.requestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

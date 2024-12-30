@@ -1,18 +1,22 @@
 package com.BookMyShow.services;
 
 import com.BookMyShow.enums.SeatType;
-import com.BookMyShow.models.Movie;
-import com.BookMyShow.models.Theater;
-import com.BookMyShow.models.TheaterSeat;
+import com.BookMyShow.models.*;
+import com.BookMyShow.repositories.MovieRepository;
+import com.BookMyShow.repositories.ShowRepository;
 import com.BookMyShow.repositories.TheaterRepository;
 import com.BookMyShow.repositories.TheaterSeatRepository;
-import com.BookMyShow.requests.AddTheaterSeatRequest;
-import com.BookMyShow.requests.AddTheaterRequest;
+import com.BookMyShow.requestDto.AddTheaterSeatRequest;
+import com.BookMyShow.requestDto.AddTheaterRequest;
+import com.BookMyShow.responseDto.GetMovieResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TheaterService {
@@ -21,6 +25,12 @@ public class TheaterService {
     private TheaterRepository theaterRepository;
     @Autowired
     private TheaterSeatRepository theaterSeatRepository;
+
+    @Autowired
+    private ShowRepository showRepository;
+
+    @Autowired
+    private MovieRepository movieRepository;
 
     public String addTheater(AddTheaterRequest addTheaterRequest) {
 
@@ -35,12 +45,14 @@ public class TheaterService {
 
 
     public String associateTheaterSeats(AddTheaterSeatRequest addTheaterSeatRequest) {
-        int theaterId = addTheaterSeatRequest.getTheaterId();
+
+        Long theaterId = addTheaterSeatRequest.getTheaterId();
         int numberOfClassicSeats = addTheaterSeatRequest.getNumberOfClassicSeats();
         int numberOfPremiumSeats = addTheaterSeatRequest.getNumberOfPremiumSeats();
 
         // 1. Get the theaterEntity from database
-        Theater theater = theaterRepository.findById(theaterId).orElseThrow(() -> new RuntimeException("Theater not found"));
+        Theater theater = theaterRepository.findById(theaterId)
+                .orElseThrow(() -> new RuntimeException("Theater not found"));
 
         // 2. Generate those seat numbers through for loop
         int numberOfRowOfClassicSeats = numberOfClassicSeats / 5;
@@ -118,16 +130,77 @@ public class TheaterService {
 
     }
 
-        // method when i put theater name then return all movies name which are playing in that theater
-        public List<String> getAllMoviesInTheater(String theaterName){
 
-            Theater theater=theaterRepository.findByTheaterName(theaterName);
-            List<String> movies=new ArrayList<>();
-            for(Movie movie:theater.getMovies()){
+    public List<GetMovieResponse> getAllMoviesInTheater(Long theaterId) {
+        // Find the theater by its name
+        Theater theater = theaterRepository.findById(theaterId)
+                .orElseThrow(()->new RuntimeException("theater is not found with this id:" + theaterId));
 
-                movies.add(movie.getMovieName());
+
+        // Fetch all shows
+        List<Show> allShows = showRepository.findAll();
+
+        List<GetMovieResponse> movieResponses=new ArrayList<>();
+
+        for(Show show:allShows){
+
+            if(show.getTheater().getTheaterId()==theaterId){
+                Movie movie=show.getMovie();
+                GetMovieResponse movieResponse=new GetMovieResponse();
+                movieResponse.setMovieName(movie.getMovieName());
+                movieResponse.setDuration(movie.getDuration());
+                movieResponse.setReleaseDate(movie.getReleaseDate());
+                movieResponse.setLanguage(movie.getLanguage());
+                movieResponse.setRating(movie.getRating());
+                movieResponses.add(movieResponse);
             }
-
-            return movies;
         }
+
+       return movieResponses;
+    }
+
+    //find one day revenue of theater
+    public String oneDayRevenueOfTheater(Long theaterId, LocalDate date){
+
+        int totalRevenue=0;
+        Theater theater=theaterRepository.findById(theaterId)
+                .orElseThrow(()->new RuntimeException("theater is not found with this id: " +theaterId ));
+
+        for(Show show:theater.getShowList()){
+
+            if(show.getShowDate().equals(date)){
+
+                for(Ticket ticket:show.getTicketList()){
+
+                    totalRevenue+=ticket.getTotalAmount();
+
+                }
+            }
+        }
+
+        return "Total revenue of theater "+theater.getTheaterName()+" on "+date+" is "+totalRevenue;
+    }
+
+    //lifeTime revenue of theater
+    public String lifeTimeRevenueOfTheater(Long theaterId){
+
+        int totalRevenue=0;
+        Theater theater=theaterRepository.findById(theaterId)
+                .orElseThrow(()->new RuntimeException("theater is not found with this id: " +theaterId ));
+
+        for(Show show:theater.getShowList()){
+
+            for(Ticket ticket:show.getTicketList()){
+
+                totalRevenue+=ticket.getTotalAmount();
+
+            }
+        }
+
+        return "Total revenue of theater "+theater.getTheaterName()+" is "+totalRevenue;
+    }
+
+
+
+
 }

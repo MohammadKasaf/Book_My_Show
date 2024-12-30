@@ -7,8 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TicketRepository extends JpaRepository<Ticket,String>{
+public interface TicketRepository extends JpaRepository<Ticket,Long>{
 
-    @Query("DELETE FROM Ticket t WHERE t.show.showId = :showId")
-    void deleteByShow(@Param("showId") int showId);
 }
+

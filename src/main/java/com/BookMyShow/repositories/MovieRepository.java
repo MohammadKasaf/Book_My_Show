@@ -9,9 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface MovieRepository extends JpaRepository<Movie,Integer> {
+public interface MovieRepository extends JpaRepository<Movie,Long> {
 
-    Movie findMovieByMovieName(String movieName);
+}
 
-    @Query("SELECT t.theaterName FROM Theater t JOIN t.movies m WHERE m.movieName = :movieName")
-    List<String> findTheaterNamesByMovieName(@Param("movieName") String movieName);}
+

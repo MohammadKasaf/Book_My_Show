@@ -1,8 +1,9 @@
 package com.BookMyShow.controllers;
 
-import com.BookMyShow.dto.MovieDTO;
-import com.BookMyShow.models.Movie;
-import com.BookMyShow.requests.UpdateMovieRequest;
+import com.BookMyShow.requestDto.AddMovieRequest;
+import com.BookMyShow.requestDto.UpdateMovieRequest;
+import com.BookMyShow.responseDto.GetMovieResponse;
+import com.BookMyShow.responseDto.GetTheaterResponse;
 import com.BookMyShow.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("movie")
@@ -22,7 +22,7 @@ public class MovieController {
     @GetMapping("/getAllMovies")
     public ResponseEntity<?> getAllMovies() {
         try {
-            List<Movie> movies = movieService.findAllMovies();
+            List<GetMovieResponse> movies = movieService.findAllMovies();
             return new ResponseEntity<>(movies, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -30,24 +30,20 @@ public class MovieController {
     }
 
     @GetMapping("/findMovie")
-    public ResponseEntity<?> findMovieById(@RequestParam("movieId") Integer movieId) {
-        try {
-            Optional<Movie> movie = movieService.findMovieById(movieId);
-            if (movie.isPresent()) {
-                return new ResponseEntity<>(movie.get(), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to find movie: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<?> findMovieById(@RequestParam("movieId") Long movieId) {
+
+        try{
+            return new ResponseEntity<>(movieService.findMovieById(movieId),HttpStatus.OK);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/addMovie")
-    public ResponseEntity<String> addMovie(@RequestBody MovieDTO movieDTO) {
+    public ResponseEntity<?> addMovie(@RequestBody AddMovieRequest movie) {
         try {
-            String response = movieService.addMovie(movieDTO);
+            String response = movieService.addMovie(movie);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,7 +63,7 @@ public class MovieController {
     }
 
     @DeleteMapping("/deleteMovie")
-    public ResponseEntity<String> deleteMovieById(@RequestParam("movieId") Integer movieId) {
+    public ResponseEntity<?> deleteMovieById(@RequestParam("movieId") Long movieId) {
         try {
             String response = movieService.deleteMovieById(movieId);
             return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
@@ -77,10 +73,10 @@ public class MovieController {
         }
     }
 
-    @GetMapping("/findTheaterNamesByMovieName")
-    public ResponseEntity<?> findTheaterNamesByMovieName(@RequestParam("movieName") String movieName) {
+    @GetMapping("/findTheaterByMovieId")
+    public ResponseEntity<?> findTheaterByMovieId(@RequestParam("movieId") Long movieId) {
         try {
-            List<String> theaterNames = movieService.findTheaterNameByMovieName(movieName);
+            List<GetTheaterResponse> theaterNames = movieService.findTheaterByMovieId(movieId);
             return new ResponseEntity<>(theaterNames, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

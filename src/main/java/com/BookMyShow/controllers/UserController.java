@@ -1,7 +1,6 @@
 package com.BookMyShow.controllers;
 
-import com.BookMyShow.dto.UserDTO;
-import com.BookMyShow.requests.AddUserRequest;
+import com.BookMyShow.requestDto.AddUserRequest;
 import com.BookMyShow.services.UserService;
 import com.BookMyShow.webtoken.JwtService;
 import com.BookMyShow.webtoken.LoginForm;
@@ -15,8 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("user")
@@ -34,11 +31,10 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserDTO userDTO;
+
 
     @PostMapping("/addUser")
-    public ResponseEntity<?> addUser( @Valid @RequestBody AddUserRequest addUserRequest) {
+    public ResponseEntity<?> addUser( @RequestBody AddUserRequest addUserRequest) {
         try {
             addUserRequest.setPassword(passwordEncoder.encode(addUserRequest.getPassword()));
             String response = userService.addUser(addUserRequest);
@@ -49,9 +45,9 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUser")
-    public ResponseEntity<?> deleteUser(@RequestBody UserDTO userDTO){
+    public ResponseEntity<?> deleteUser(@RequestParam Long userId){
         try {
-            String response = userService.deleteUserByNameAndId(userDTO);
+            String response = userService.deleteUserByNameAndId(userId);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -70,11 +66,11 @@ public class UserController {
         }
     }
 
-    @GetMapping("/getUserByUsername")
-    public ResponseEntity<?> getUser(@RequestParam("name")String name){
+    @GetMapping("/getUserById")
+    public ResponseEntity<?> getUser(@RequestParam("userId")Long userId){
 
         try{
-            return new ResponseEntity<>(userService.findUser(name),HttpStatus.FOUND);
+            return new ResponseEntity<>(userService.findUser(userId),HttpStatus.FOUND);
         }
         catch (Exception e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);

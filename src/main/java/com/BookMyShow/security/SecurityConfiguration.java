@@ -13,18 +13,19 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
-@EnableMethodSecurity
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
     @Autowired
@@ -39,26 +40,22 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(){
+    public AuthenticationManager authenticationManager() {
 
         return new ProviderManager(authenticationProvider());
     }
 
     @Bean
-    public UserDetailsService userDetailsService(){
-
+    public UserDetailsService userDetailsService() {
         return userService;
-
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
-
-        DaoAuthenticationProvider provider=new DaoAuthenticationProvider();
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
-
     }
 
     @Bean
@@ -66,21 +63,35 @@ public class SecurityConfiguration {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(registry -> {
-                   registry.requestMatchers("/movie/addMovie","/movie/updateMovie","/movie/deleteMovie").hasRole("ADMIN");
-                   registry.requestMatchers("/movie/**").hasAnyRole("ADMIN","USER");
-                   registry.requestMatchers("/show/**").hasRole("ADMIN");
-                   registry.requestMatchers("/theater/addTheater","/theater/associateSeats").hasRole("ADMIN");
-                   registry.requestMatchers("theater/**").hasAnyRole("ADMIN","USER");
-                   registry.requestMatchers("/ticket/generateTicket").hasRole("ADMIN");
-                   registry.requestMatchers("/ticket/**").hasAnyRole("ADMIN","USER");
-                   registry.requestMatchers("/user/**").hasAnyRole("ADMIN","USER");
-                   registry.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
-
+                    registry.requestMatchers("/movie/**").permitAll();
+                    registry.requestMatchers("/show/**").permitAll();
+                    registry.requestMatchers("/theater/**").permitAll();
+                    registry.requestMatchers("/ticket/**").permitAll();
+                    registry.requestMatchers("/user/**").permitAll();
+                    registry.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
+                    registry.requestMatchers("/login").permitAll(); // Ensure /login is permitted
                 })
-                .formLogin(formLogin -> formLogin.permitAll()) // Permit all for form login
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login")  // Define the login page URL if not default
+                        .permitAll())         // Permit access to the login page
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter
                 .build();
     }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("*") // Replace with specific domains for production
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(false); // Set true only if cookies/auth headers are required
+            }
+        };
+    }
+
 
 
 
